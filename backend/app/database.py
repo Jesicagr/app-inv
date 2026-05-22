@@ -1,5 +1,4 @@
 import sqlite3
-from contextlib import contextmanager
 
 DB_NAME = "control_recursos.db"
 
@@ -7,7 +6,7 @@ def inicializar_tablas():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     
-    # Ubicaciones oficiales (Capillas / Sedes)
+    # 1. Tabla de Propiedades
     cursor.execute('''CREATE TABLE IF NOT EXISTS propiedades (
         id_propiedad TEXT PRIMARY KEY,
         nombre TEXT,
@@ -15,7 +14,7 @@ def inicializar_tablas():
         lon_oficial REAL
     )''')
     
-    # Catálogo de consumibles y precios de mercado
+    # 2. Tabla de Catálogo de Precios
     cursor.execute('''CREATE TABLE IF NOT EXISTS catalogo_precios (
         id_servicio TEXT PRIMARY KEY,
         nombre_producto TEXT,
@@ -24,7 +23,7 @@ def inicializar_tablas():
         stock_minimo INTEGER
     )''')
     
-    # Historial de Auditorías y alertas
+    # 3. Tabla de Gastos
     cursor.execute('''CREATE TABLE IF NOT EXISTS gastos (
         id_ticket INTEGER PRIMARY KEY AUTOINCREMENT,
         id_propiedad TEXT,
@@ -39,10 +38,12 @@ def inicializar_tablas():
     conn.commit()
     conn.close()
 
-@contextmanager
+# ⚡ ESTA ES LA FUNCIÓN QUE CORREGIMOS: Quitamos @contextmanager 
+# FastAPI maneja el ciclo de vida por sí solo si usas yield de forma nativa.
 def get_db():
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
+    # ⚡ AGREGAMOS EL PARÁMETRO check_same_thread=False AQUÍ:
+    conn = sqlite3.connect(DB_NAME, check_same_thread=False)
+    conn.row_factory = sqlite3.Row  # Esto permite acceder por nombres de columnas
     try:
         yield conn
     finally:

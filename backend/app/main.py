@@ -70,17 +70,42 @@ async def crear_inspeccion(
 
 @app.get("/api/dashboard")
 async def obtener_dashboard(db=Depends(get_db)):
-    cursor = db.cursor()
-    cursor.execute("SELECT COUNT(*) as total FROM gastos")
-    total_activos = cursor.fetchone()["total"]
-    
-    cursor.execute("SELECT COUNT(*) as alertas FROM gastos WHERE alerta_gps != 'VALIDADO' OR alerta_financiera != 'OK'")
-    alertas = cursor.fetchone()["alertas"]
-    
-    cursor.execute("SELECT * FROM gastos ORDER BY id_ticket DESC LIMIT 5")
-    recientes = [dict(row) for row in cursor.fetchall()]
-    
-    return {"total_activos": total_activos, "alertas_criticas": alertas, "recientes": recientes}
+    try:
+        cursor = db.cursor()
+        
+        # 1. Conteo de gastos usando índices puros de tupla (más rápido y seguro)
+        cursor.execute("SELECT COUNT(*) FROM gastos")
+        res_total = cursor.fetchone()
+        total_activos = res_total[0] if (res_total and res_total[0] is not None) else 0
+        
+        # 2. Conteo de alertas
+        try:
+            cursor.execute("SELECT COUNT(*) FROM gastos WHERE alerta_gps != 'VALIDADO' OR alerta_financiera != 'OK'")
+            res_alertas = cursor.fetchone()
+            alertas = res_alertas[0] if (res_alertas and res_alertas[0] is not None) else 0
+        except Exception as e_alertas:
+            print(f"Aviso en conteo de alertas: {e_alertas}")
+            alertas = 0
+        
+        # 3. Historial reciente
+        try:
+            cursor.execute("SELECT * FROM gastos ORDER BY id_ticket DESC LIMIT 5")
+            filas = cursor.fetchall()
+            recientes = [dict(row) for row in filas] if filas else []
+        except Exception as e_filas:
+            print(f"Aviso en filas recientes: {e_filas}")
+            recientes = []
+        
+        return {
+            "total_activos": total_activos, 
+            "alertas_criticas": alertas, 
+            "recientes": recientes
+        }
+        
+    except Exception as e:
+        # Esto imprimirá el error real con detalles en tu terminal de Uvicorn
+        print(f"❌ ERROR CRÍTICO EN DASHBOARD: {str(e)}")
+        return {"total_activos": 0, "alertas_criticas": 0, "recientes": []}
 
 @app.get("/api/consumibles")
 async def listar_consumibles(db=Depends(get_db)):
