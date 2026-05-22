@@ -1,0 +1,8 @@
+Instrucciones de Despliegue Local
+Levantar el Servidor Backend:
+
+cd C:\Users\jesia\OneDrive\Desktop\appINV\backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+
+.\.venv\Scripts\Activate.ps1
