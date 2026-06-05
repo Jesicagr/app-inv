@@ -1,8 +1,28 @@
-'use client';
+"use client";
 
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Camera, MapPin, CheckCircle, AlertTriangle, ShieldCheck, RefreshCw } from 'lucide-react';
+=======
+import { useState } from "react";
+import {
+  Camera,
+  CheckCircle,
+  AlertTriangle,
+  ShieldCheck,
+  RefreshCw,
+  MapPin,
+} from "lucide-react";
+import PageHeader from "../../components/ui/PageHeader";
+import { getApiUrl } from "../../lib/api";
+
+type AuditResult = {
+  alerta_gps?: string;
+  alerta_financiera?: string;
+  id_ticket?: string;
+};
+>>>>>>> 4538650ba3315826d04261223d56a585de25cba6
 
 const MapaAuditoria = dynamic(() => import('../../components/MapaInspeccion'), {
   ssr: false,
@@ -10,11 +30,20 @@ const MapaAuditoria = dynamic(() => import('../../components/MapaInspeccion'), {
 });
 
 export default function AuditoriaPage() {
+<<<<<<< HEAD
   const [capillas, setCapillas] = useState<any[]>([]);
   const [formData, setFormData] = useState({ id_propiedad: '', nombre_propiedad: '', id_servicio: '', monto: '', estado_fisico: 'Excelente' });
+=======
+  const [formData, setFormData] = useState({
+    id_propiedad: "",
+    id_servicio: "",
+    monto: "",
+    estado_fisico: "Excelente",
+  });
+>>>>>>> 4538650ba3315826d04261223d56a585de25cba6
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<AuditResult | null>(null);
 
   // Consultamos las capillas reales de Santa Fe y Santo Tomé al cargar
   useEffect(() => {
@@ -38,40 +67,59 @@ export default function AuditoriaPage() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) setFile(e.target.files[0]);
+    if (e.target.files?.[0]) {
+      setFile(e.target.files[0]);
+    }
   };
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file) {
+      return;
+    }
+
     setLoading(true);
 
     const data = new FormData();
+<<<<<<< HEAD
     data.append('id_propiedad', formData.id_propiedad);
     data.append('nombre_propiedad', formData.nombre_propiedad);
     data.append('id_servicio', formData.id_servicio);
     data.append('monto', formData.monto);
     data.append('estado_fisico', formData.estado_fisico);
     data.append('foto', file);
+=======
+    data.append("id_propiedad", formData.id_propiedad);
+    data.append("id_servicio", formData.id_servicio);
+    data.append("monto", formData.monto);
+    data.append("estado_fisico", formData.estado_fisico);
+    data.append("foto", file);
+>>>>>>> 4538650ba3315826d04261223d56a585de25cba6
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/inspecciones', { method: 'POST', body: data });
+      const res = await fetch(getApiUrl("/api/inspecciones"), {
+        method: "POST",
+        body: data,
+      });
       const dataJson = await res.json();
       setResult(dataJson);
     } catch (err) {
       console.error(err);
+      setResult(null);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900">Auditoría y Verificación Técnica</h2>
-        <p className="text-sm text-slate-500">Módulo de conciliación geográfica mediante extracción de metadatos EXIF.</p>
-      </div>
+    <>
+      <PageHeader
+        eyebrow="Inspeccion tecnica"
+        title="Auditoria"
+        description="Este modulo ya queda alineado con el resto del frontend: a la izquierda el registro de campo y a la derecha el dictamen que devuelve el backend."
+      />
 
+<<<<<<< HEAD
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         {/* Formulario Izquierdo */}
         <form onSubmit={handleUpload} className="space-y-4">
@@ -108,9 +156,34 @@ export default function AuditoriaPage() {
                   {est}
                 </button>
               ))}
-            </div>
-          </div>
+=======
+      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <article className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Captura
+          </p>
+          <h3 className="mt-2 text-xl font-semibold text-slate-900">
+            Registro de inspeccion
+          </h3>
 
+          <form onSubmit={handleUpload} className="mt-6 space-y-4">
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Id ubicacion oficial
+              </label>
+              <input
+                type="text"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-colors focus:border-slate-900 focus:bg-white"
+                placeholder="Ej. CAP-01"
+                onChange={(e) =>
+                  setFormData({ ...formData, id_propiedad: e.target.value })
+                }
+                required
+              />
+>>>>>>> 4538650ba3315826d04261223d56a585de25cba6
+            </div>
+
+<<<<<<< HEAD
           <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:bg-slate-50 transition-colors cursor-pointer">
             <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleFileChange} />
             <Camera className="w-8 h-8 mx-auto text-slate-400 mb-1" />
@@ -130,16 +203,46 @@ export default function AuditoriaPage() {
               <MapPin className="w-12 h-12 mx-auto stroke-1 text-slate-300" />
               <p className="text-sm font-semibold text-slate-600">Esperando Captura de Datos</p>
               <p className="text-xs text-slate-400 max-w-[250px]">Los metadatos e indicadores geográficos se calcularán al enviar el formulario.</p>
+=======
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Id gasto o consumible
+              </label>
+              <input
+                type="text"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-colors focus:border-slate-900 focus:bg-white"
+                placeholder="Ej. PINTURA"
+                onChange={(e) =>
+                  setFormData({ ...formData, id_servicio: e.target.value })
+                }
+                required
+              />
+>>>>>>> 4538650ba3315826d04261223d56a585de25cba6
             </div>
-          )}
 
+<<<<<<< HEAD
           {loading && (
             <div className="space-y-3 text-center p-6 animate-pulse">
               <RefreshCw className="w-10 h-10 mx-auto animate-spin text-blue-900" />
               <p className="text-sm font-bold text-slate-700">Abriendo bloque EXIF...</p>
+=======
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Monto de factura
+              </label>
+              <input
+                type="number"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-colors focus:border-slate-900 focus:bg-white"
+                placeholder="0.00"
+                onChange={(e) =>
+                  setFormData({ ...formData, monto: e.target.value })
+                }
+                required
+              />
+>>>>>>> 4538650ba3315826d04261223d56a585de25cba6
             </div>
-          )}
 
+<<<<<<< HEAD
           {result && (
             <div className="w-full space-y-4">
               <div className="flex justify-between items-center border-b border-slate-200 pb-2">
@@ -165,11 +268,152 @@ export default function AuditoriaPage() {
                     </p>
                   </div>
                 </div>
+=======
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Estado fisico detectado
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {["Excelente", "Desgaste", "Danado"].map((state) => (
+                  <button
+                    key={state}
+                    type="button"
+                    onClick={() =>
+                      setFormData({ ...formData, estado_fisico: state })
+                    }
+                    className={`rounded-2xl border px-3 py-2 text-xs font-semibold transition-colors ${
+                      formData.estado_fisico === state
+                        ? "border-amber-300 bg-amber-50 text-amber-900"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                    }`}
+                  >
+                    {state}
+                  </button>
+                ))}
+>>>>>>> 4538650ba3315826d04261223d56a585de25cba6
               </div>
             </div>
-          )}
-        </div>
-      </div>
-    </div>
+
+            <label className="relative block cursor-pointer rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-center transition-colors hover:bg-white">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="absolute inset-0 opacity-0"
+                onChange={handleFileChange}
+              />
+              <Camera className="mx-auto h-9 w-9 text-slate-400" />
+              <span className="mt-2 block text-sm font-medium text-slate-600">
+                {file ? file.name : "Tomar foto en campo"}
+              </span>
+            </label>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              {loading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <ShieldCheck className="h-4 w-4" />
+              )}
+              {loading ? "Analizando coordenadas..." : "Registrar e inspeccionar"}
+            </button>
+          </form>
+        </article>
+
+        <article className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Dictamen
+          </p>
+          <h3 className="mt-2 text-xl font-semibold text-slate-900">
+            Resultado de la inspeccion
+          </h3>
+
+          <div className="mt-6 flex min-h-[420px] flex-col justify-center rounded-[24px] border border-slate-200 bg-slate-50 p-6">
+            {!result && !loading ? (
+              <div className="text-center text-slate-400">
+                <MapPin className="mx-auto h-12 w-12" />
+                <p className="mt-3 text-sm font-medium text-slate-600">
+                  Esperando captura de datos
+                </p>
+                <p className="mt-2 text-sm text-slate-500">
+                  El backend devolvera el dictamen geografico y financiero cuando envias el formulario.
+                </p>
+              </div>
+            ) : null}
+
+            {loading ? (
+              <div className="text-center text-slate-700">
+                <RefreshCw className="mx-auto h-10 w-10 animate-spin" />
+                <p className="mt-3 text-sm font-semibold">
+                  Extrayendo bloque EXIF y validando datos...
+                </p>
+              </div>
+            ) : null}
+
+            {result ? (
+              <div className="space-y-4">
+                <div
+                  className={`rounded-[24px] border p-4 ${
+                    result.alerta_gps === "VALIDADO"
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-950"
+                      : "border-rose-200 bg-rose-50 text-rose-950"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    {result.alerta_gps === "VALIDADO" ? (
+                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                    ) : (
+                      <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+                    )}
+                    <div>
+                      <h4 className="text-sm font-semibold">
+                        Control geografico
+                      </h4>
+                      <p className="mt-1 text-sm">{result.alerta_gps}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={`rounded-[24px] border p-4 ${
+                    result.alerta_financiera === "OK"
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-950"
+                      : "border-amber-200 bg-amber-50 text-amber-950"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    {result.alerta_financiera === "OK" ? (
+                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                    ) : (
+                      <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+                    )}
+                    <div>
+                      <h4 className="text-sm font-semibold">
+                        Control financiero
+                      </h4>
+                      <p className="mt-1 text-sm">{result.alerta_financiera}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {result.id_ticket ? (
+                  <a
+                    href={getApiUrl(`/api/acta/${result.id_ticket}`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+                  >
+                    Descargar acta de inspeccion
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        </article>
+      </section>
+    </>
   );
 }

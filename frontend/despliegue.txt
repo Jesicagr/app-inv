@@ -1,0 +1,69 @@
+Instrucciones de Despliegue Local
+
+Problema comun en Windows:
+Si PowerShell muestra que `node`, `npm` o `npm.cmd` "no se reconoce",
+entonces Node.js no esta instalado o no esta agregado al PATH.
+
+Si PowerShell muestra que `npm.ps1` no puede ejecutarse por la politica
+de scripts, puedes usar `npm.cmd` o habilitar scripts para tu usuario.
+
+1. Verificar que Node.js este instalado:
+   & 'C:\Program Files\nodejs\node.exe' -v
+
+2. Si el comando anterior funciona pero `npm` no aparece en la terminal,
+   agregar `C:\Program Files\nodejs` al PATH o usar los comandos con ruta
+   completa desde PowerShell.
+
+3. Abrir una nueva terminal de PowerShell y ubicarse en el frontend:
+   cd C:\Users\Santiago\Documents\INV\app-inv\frontend
+
+4. Si PowerShell bloquea `npm.ps1`, ejecutar una de estas opciones:
+   npm.cmd -v
+   o
+   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+
+5. Instalar dependencias:
+   npm.cmd install
+
+6. Opcional pero recomendado: crear un archivo `.env.local` para definir la
+   URL base del backend:
+   NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+
+7. Si vas a cargar capillas desde el mapa de la Iglesia, define tambien el
+   endpoint real y, si aplica, el token que descubras en la pestaña Network:
+   MEETINGHOUSE_API_URL=https://maps.churchofjesuschrist.org/api/maps-proxy/v2/locations/clusters
+   MEETINGHOUSE_API_TOKEN=ncqmw6
+
+8. Verificar que el backend este levantado en:
+   http://127.0.0.1:8000
+
+9. Levantar el frontend en desarrollo:
+   npm.cmd run dev
+
+10. Abrir la aplicacion en el navegador:
+   http://localhost:3000
+
+Produccion local:
+
+1. Generar el build:
+   npm.cmd run build
+
+2. Iniciar el servidor de Next.js:
+   npm.cmd run start
+
+3. Exponer el puerto 3000 detras de un proxy reverso si se publica hacia
+   internet. Next.js recomienda usar `next start` detras de nginx o un
+   proxy equivalente para self-hosting.
+
+Importante:
+El frontend ahora toma la URL base del backend desde
+`NEXT_PUBLIC_API_BASE_URL`. Si no defines esa variable, usa por defecto:
+`http://127.0.0.1:8000`
+
+La carga de capillas usa `MEETINGHOUSE_API_URL`. Si no la defines, el
+frontend usa por defecto el endpoint de clusters descubierto desde el sitio.
+Si el token cambia o deja de responder, actualiza `MEETINGHOUSE_API_TOKEN`.
+
+Opcional:
+Si prefieres evitar la politica de scripts de PowerShell, puedes usar
+siempre `npm.cmd` en lugar de `npm`.

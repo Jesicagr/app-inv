@@ -1,16 +1,33 @@
 Instrucciones de Despliegue Local
-Levantar el Servidor Backend:
 
-cd C:\Users\jesia\OneDrive\Desktop\appINV\backend
+Problema comun en Windows:
+Si PowerShell muestra que `python` o `uvicorn` "no se reconoce",
+entonces Python no esta instalado o no esta agregado al PATH.
 
-pip install -r requirements.txt
+Si `py --version` responde `No installed Python found!`, el lanzador de
+Python esta presente pero no hay ninguna version de Python instalada.
 
-Entorno:
-.\.venv\Scripts\Activate.ps1
+1. Instalar Python 3.12 o superior desde https://www.python.org/downloads/
+   Durante la instalacion, marcar "Add python.exe to PATH".
 
+2. Abrir una nueva terminal de PowerShell y ubicarse en el backend:
+   cd C:\Users\Santiago\Documents\INV\app-inv\backend
 
-uvicorn app.main:app --reload
+3. Verificar la instalacion:
+   py --version
 
+4. Crear el entorno virtual:
+   py -m venv .venv
 
+5. Activar el entorno virtual:
+   .\.venv\Scripts\Activate.ps1
 
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+6. Instalar dependencias:
+   python -m pip install -r requirements.txt
+
+7. Levantar el backend:
+   python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+Opcional:
+Si PowerShell bloquea la activacion del entorno virtual, ejecutar:
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
