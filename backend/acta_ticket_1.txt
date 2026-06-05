@@ -1,0 +1,15 @@
+
+    ACTA DE INSPECCIÓN DE RECURSOS - TICKET #1
+    ----------------------------------------------
+    FECHA: None
+    PROPIEDAD: fdfdf (fdfdf)
+    SERVICIO: dfdfdfd
+    MONTO REPORTADO: $65455315521.0
+    
+    RESULTADOS DE AUDITORÍA:
+    - CONTROL FINANCIERO: OK
+    - CONTROL GEOGRÁFICO: ERROR: Sin metadatos GPS
+    
+    DICTAMEN FINAL: None
+    ----------------------------------------------
+    
