@@ -1,110 +1,179 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Package, Wallet, FileText, AlertTriangle, History } from 'lucide-react';
+import { useEffect, useMemo, useState } from "react";
+import { AlertTriangle, FileText, History, Package, Wallet } from "lucide-react";
+import PageHeader from "../../components/ui/PageHeader";
+import StatCard from "../../components/ui/StatCard";
+import { getApiUrl } from "../../lib/api";
+
+type Consumible = {
+  id_servicio: string;
+  nombre_producto: string;
+  stock_actual: number;
+  stock_minimo: number;
+};
 
 export default function ConsumiblesPage() {
-  const [productos, setProductos] = useState([]);
+  const [productos, setProductos] = useState<Consumible[]>([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/consumibles')
-      .then(res => res.json())
-      .then(data => setProductos(data))
-      .catch(err => console.warn("Error al conectar consumibles:", err));
+    fetch(getApiUrl("/api/consumibles"))
+      .then((res) => res.json())
+      .then((data) => setProductos(data))
+      .catch((err) => console.warn("Error al conectar consumibles:", err));
   }, []);
 
+  const summary = useMemo(() => {
+    const criticalItems = productos.filter(
+      (item) => item.stock_actual <= item.stock_minimo,
+    );
+    const totalUnits = productos.reduce((acc, item) => acc + item.stock_actual, 0);
+
+    return {
+      totalProducts: productos.length,
+      criticalItems: criticalItems.length,
+      totalUnits,
+    };
+  }, [productos]);
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Inventario de Consumibles</h2>
-        <p className="text-sm text-slate-500">Gestión, validación de gasto y control de stock institucional.</p>
-      </div>
+    <>
+      <PageHeader
+        eyebrow="Inventario"
+        title="Consumibles"
+        description="Este modulo concentra el catalogo operativo, el estado de stock y una vista clara de los productos que merecen seguimiento inmediato."
+      />
 
-      {/* Fila de Kpis Superiores */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-800 shrink-0">
-            <Wallet className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Presupuesto Mensual</p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">$12,500.00</p>
-          </div>
-        </div>
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          title="Productos"
+          value={summary.totalProducts.toString()}
+          caption="Items registrados en catalogo"
+          icon={Package}
+        />
+        <StatCard
+          title="Unidades"
+          value={summary.totalUnits.toString()}
+          caption="Suma simple del stock actual"
+          icon={Wallet}
+        />
+        <StatCard
+          title="Alertas de stock"
+          value={summary.criticalItems.toString()}
+          caption="Productos iguales o por debajo del minimo"
+          icon={AlertTriangle}
+          tone={summary.criticalItems > 0 ? "danger" : "success"}
+        />
+        <StatCard
+          title="Catalogo visible"
+          value={productos.length ? "Activo" : "Pendiente"}
+          caption="El listado se alimenta desde el backend"
+          icon={FileText}
+          tone="warning"
+        />
+      </section>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
-            <FileText className="w-6 h-6" />
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <article className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+              Catalogo
+            </p>
+            <h3 className="mt-2 text-xl font-semibold text-slate-900">
+              Productos disponibles
+            </h3>
           </div>
-          <div>
-            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Gasto Validado</p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">$4,320.50</p>
-          </div>
-        </div>
 
-        <div className="bg-red-50 border border-red-200 rounded-xl p-5 shadow-sm flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center shrink-0">
-            <AlertTriangle className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-xs text-red-700 font-semibold uppercase tracking-wider">Alertas de Stock</p>
-            <p className="text-2xl font-bold text-red-900 mt-1">8 Ítems</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Cuerpo Principal Split */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Tabla de Productos */}
-        <div className="lg:col-span-8 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b border-slate-200 font-semibold text-slate-700">Catálogo de Productos</div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
-                  <th className="py-3 px-4">ID</th>
-                  <th className="py-3 px-4">Producto</th>
-                  <th className="py-3 px-4 text-right">Stock</th>
-                  <th className="py-3 px-4 text-center">Estado</th>
+            <table className="min-w-full text-left">
+              <thead className="bg-slate-50 text-xs uppercase tracking-[0.18em] text-slate-500">
+                <tr>
+                  <th className="px-6 py-4 font-semibold">Id</th>
+                  <th className="px-6 py-4 font-semibold">Producto</th>
+                  <th className="px-6 py-4 font-semibold text-right">Stock</th>
+                  <th className="px-6 py-4 font-semibold text-center">Estado</th>
                 </tr>
               </thead>
-              <tbody className="text-sm divide-y divide-slate-100">
-                {productos.map((prod: any) => (
-                  <tr key={prod.id_servicio} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3 px-4 font-mono text-slate-400">{prod.id_servicio}</td>
-                    <td className="py-3 px-4 font-semibold text-slate-900">{prod.nombre_producto}</td>
-                    <td className="py-3 px-4 text-right font-medium">{prod.stock_actual} ud.</td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${prod.stock_actual <= prod.stock_minimo ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                        {prod.stock_actual <= prod.stock_minimo ? 'Crítico' : 'Óptimo'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-slate-100 text-sm">
+                {productos.map((prod) => {
+                  const isCritical = prod.stock_actual <= prod.stock_minimo;
+
+                  return (
+                    <tr key={prod.id_servicio} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 font-mono text-slate-500">
+                        {prod.id_servicio}
+                      </td>
+                      <td className="px-6 py-4 font-medium text-slate-900">
+                        {prod.nombre_producto}
+                      </td>
+                      <td className="px-6 py-4 text-right text-slate-700">
+                        {prod.stock_actual} ud.
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                            isCritical
+                              ? "bg-rose-100 text-rose-800"
+                              : "bg-emerald-100 text-emerald-800"
+                          }`}
+                        >
+                          {isCritical ? "Critico" : "Optimo"}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-        </div>
+        </article>
 
-        {/* Historial Lateral */}
-        <div className="lg:col-span-4 bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-4">
-          <h3 className="font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
-            <History className="w-5 h-5 text-slate-400" /> Historial de Movimientos
-          </h3>
-          <div className="relative border-l-2 border-slate-200 ml-2 space-y-4 text-xs">
-            <div className="relative pl-4">
-              <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-blue-900"></div>
-              <p className="text-slate-400">Hoy, 10:45 AM</p>
-              <p className="font-semibold text-slate-800 mt-0.5">Salida de Stock: Papel Toalla</p>
+        <article className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white">
+              <History className="h-5 w-5" />
             </div>
-            <div className="relative pl-4">
-              <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-green-600"></div>
-              <p className="text-slate-400">Hoy, 09:12 AM</p>
-              <p className="font-semibold text-slate-800 mt-0.5">Ingreso de Stock: Café Grano (10 kg)</p>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                Historial
+              </p>
+              <h3 className="mt-1 text-xl font-semibold text-slate-900">
+                Movimientos de referencia
+              </h3>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+
+          <div className="mt-6 space-y-4">
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                Hoy · 10:45
+              </p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">
+                Salida de stock: Papel toalla
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Movimiento de consumo para operacion diaria.
+              </p>
+            </div>
+
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                Hoy · 09:12
+              </p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">
+                Ingreso de stock: Cafe en grano
+              </p>
+              <p className="mt-1 text-sm text-slate-500">
+                Reposicion registrada para abastecimiento semanal.
+              </p>
+            </div>
+
+            <div className="rounded-[24px] border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+              Usa esta columna como tablero rapido para luego conectar movimientos reales del backend.
+            </div>
+          </div>
+        </article>
+      </section>
+    </>
   );
 }

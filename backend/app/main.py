@@ -1,10 +1,17 @@
 from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .database import inicializar_tablas, get_db
-from .utils import extraer_gps
 from datetime import datetime
 import os
 import shutil
+import sys
+
+try:
+    from .database import inicializar_tablas, get_db
+    from .utils import extraer_gps
+except ImportError:
+    from database import inicializar_tablas, get_db
+    from utils import extraer_gps
 
 app = FastAPI(title="AssetSteward API")
 
@@ -64,9 +71,10 @@ async def crear_inspeccion(
     cursor.execute('''INSERT INTO gastos (id_propiedad, id_servicio, monto_pagado, fecha, alerta_financiera, alerta_gps, estado_fisico)
                       VALUES (?, ?, ?, ?, ?, ?, ?)''', 
                    (id_propiedad, id_servicio, monto, fecha, alerta_fin, alerta_gps, estado_fisico))
+    id_ticket = cursor.lastrowid
     db.commit()
     
-    return {"status": "success", "alerta_financiera": alerta_fin, "alerta_gps": alerta_gps}
+    return {"status": "success", "alerta_financiera": alerta_fin, "alerta_gps": alerta_gps, "id_ticket": id_ticket}
 
 @app.get("/api/dashboard")
 async def obtener_dashboard(db=Depends(get_db)):
@@ -112,3 +120,33 @@ async def listar_consumibles(db=Depends(get_db)):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM catalogo_precios")
     return [dict(row) for row in cursor.fetchall()]
+
+@app.get("/api/acta/{id_ticket}")
+async def generar_acta_pdf_texto(id_ticket: int, db=Depends(get_db)):
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM gastos WHERE id_ticket=?", (id_ticket,))
+    g = cursor.fetchone()
+    if not g:
+        raise HTTPException(status_code=404, detail="Ticket no encontrado")
+    
+    acta = f"""
+    ACTA DE INSPECCIÓN DE RECURSOS - TICKET #{g['id_ticket']}
+    ----------------------------------------------
+    FECHA: {g['fecha']}
+    PROPIEDAD: {g['id_propiedad']}
+    MONTO REPORTADO: ${g['monto_pagado']}
+    
+    RESULTADOS DE AUDITORÍA:
+    - CONTROL FINANCIERO: {g['alerta_financiera']}
+    - CONTROL GEOGRÁFICO: {g['alerta_gps']}
+    
+    DICTAMEN: {"APROBADO" if g['alerta_financiera'] == "OK" and g['alerta_gps'] == "VALIDADO" else "REPROBADO - REQUIERE INVESTIGACIÓN"}
+    ----------------------------------------------
+    """
+    
+    file_name = f"acta_ticket_{g['id_ticket']}.txt"
+    file_path = os.path.join(os.getcwd(), file_name)
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(acta)
+        
+    return FileResponse(path=file_path, filename=file_name, media_type='text/plain')
