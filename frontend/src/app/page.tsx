@@ -1,224 +1,146 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
-  Boxes,
-  CheckCircle,
+  FileEdit,
   ClipboardCheck,
   Package,
+  Boxes,
   ShieldAlert,
+  Receipt,
 } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import StatCard from "../components/ui/StatCard";
-import { getApiUrl } from "../lib/api";
+import { serverApi } from "../lib/server-api";
 
-type DashboardRecord = {
-  id_ticket: string;
+type GastoReciente = {
+  id_ticket: number;
   id_propiedad: string;
+  nombre_propiedad: string | null;
+  id_servicio: string;
   monto_pagado: number;
+  fecha_registro: string;
+  alerta_financiera: string;
   alerta_gps: string;
+  dictamen_final: string;
 };
 
 type DashboardMetrics = {
-  total_activos: number;
   alertas_criticas: number;
-  recientes: DashboardRecord[];
+  requerimientos_pendientes: number;
+  recientes: GastoReciente[];
 };
 
-const initialMetrics: DashboardMetrics = {
-  total_activos: 0,
-  alertas_criticas: 0,
-  recientes: [],
-};
-
-const quickAccess = [
-  {
-    href: "/consumibles",
-    title: "Consumibles",
-    description: "Controla stock, gasto validado y movimientos recientes.",
-    icon: Package,
-  },
-  {
-    href: "/activos",
-    title: "Activos fijos",
-    description: "Consulta el inventario fisico y el mapa de relevamiento.",
-    icon: Boxes,
-  },
-  {
-    href: "/auditoria",
-    title: "Auditoria",
-    description: "Registra inspecciones y descarga actas tecnicas.",
-    icon: ClipboardCheck,
-  },
+const quickLinks = [
+  { href: "/consumibles", label: "Consumibles", icon: Package },
+  { href: "/activos", label: "Activos", icon: Boxes },
+  { href: "/auditoria", label: "Auditoría", icon: ClipboardCheck },
+  { href: "/requerimientos", label: "Requerimientos", icon: FileEdit },
 ];
 
-export default function Dashboard() {
-  const [metrics, setMetrics] = useState<DashboardMetrics>(initialMetrics);
+export default async function Dashboard() {
+  let metrics: DashboardMetrics = { alertas_criticas: 0, requerimientos_pendientes: 0, recientes: [] };
 
-  useEffect(() => {
-    fetch(getApiUrl("/api/dashboard"))
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("No se pudo obtener el dashboard");
-        }
-        return res.json();
-      })
-      .then((data) => setMetrics(data))
-      .catch((err) => {
-        console.warn("No se pudo conectar con el backend:", err.message);
-        setMetrics(initialMetrics);
-      });
-  }, []);
-
-  const openAlerts = metrics.recientes.filter(
-    (item) => item.alerta_gps !== "VALIDADO",
-  );
+  try {
+    metrics = await serverApi.get<DashboardMetrics>("/api/dashboard");
+  } catch {
+    // fallback defaults
+  }
 
   return (
     <>
       <PageHeader
-        eyebrow="Vista general"
-        title="Tablero de control"
-        description="Organizamos el frontend alrededor de modulos claros para que el seguimiento operativo sea mas simple: dashboard, consumibles, activos, auditoria y reportes."
-        actions={
-          <Link
-            href="/reportes"
-            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
-          >
-            Abrir reportes
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        }
+        title="Panel"
+        description="Resumen rápido del estado del sistema."
       />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-3 md:grid-cols-3">
         <StatCard
-          title="Activos auditados"
-          value={metrics.total_activos.toString()}
-          caption="Registros consolidados desde el backend"
-          icon={Boxes}
-        />
-        <StatCard
-          title="Alertas criticas"
+          title="Alertas críticas"
           value={metrics.alertas_criticas.toString()}
-          caption="Casos que requieren revision prioritaria"
+          caption="GPS o financieras"
           icon={ShieldAlert}
           tone={metrics.alertas_criticas > 0 ? "danger" : "success"}
         />
         <StatCard
-          title="Inspecciones recientes"
-          value={metrics.recientes.length.toString()}
-          caption="Tickets disponibles para seguimiento"
-          icon={ClipboardCheck}
+          title="Req. pendientes"
+          value={metrics.requerimientos_pendientes.toString()}
+          caption="Sin asignar"
+          icon={FileEdit}
+          tone={metrics.requerimientos_pendientes > 0 ? "warning" : "success"}
         />
-        <StatCard
-          title="Tickets validados"
-          value={metrics.recientes.filter((item) => item.alerta_gps === "VALIDADO").length.toString()}
-          caption="Conciliacion geografica sin observaciones"
-          icon={CheckCircle}
-          tone="success"
-        />
+        <Link
+          href="/reportes"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:bg-slate-50"
+        >
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Reportes</p>
+            <p className="mt-1 text-sm text-slate-600">Ver reportes completos</p>
+          </div>
+          <ArrowRight className="h-5 w-5 text-slate-400" />
+        </Link>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <article className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Acceso rapido
-              </p>
-              <h3 className="mt-2 text-xl font-semibold text-slate-900">
-                Modulos principales del frontend
-              </h3>
-            </div>
+      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Módulos</p>
+        <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
+          {quickLinks.map(({ href, label, icon: Icon }) => (
             <Link
-              href="/activos"
-              className="hidden text-sm font-semibold text-slate-500 transition-colors hover:text-slate-900 md:inline-flex"
+              key={href}
+              href={href}
+              className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
-              Ver estructura completa
+              <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+              {label}
             </Link>
-          </div>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {quickAccess.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="group rounded-[24px] border border-slate-200 bg-slate-50 p-5 transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md"
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h4 className="mt-4 text-lg font-semibold text-slate-900">
-                    {item.title}
-                  </h4>
-                  <p className="mt-2 text-sm leading-6 text-slate-500">
-                    {item.description}
-                  </p>
-                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
-                    Abrir modulo
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </article>
-
-        <article className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-            Seguimiento
-          </p>
-          <h3 className="mt-2 text-xl font-semibold text-slate-900">
-            Alertas recientes para resolucion
-          </h3>
-          <div className="mt-6 space-y-4">
-            {openAlerts.length === 0 ? (
-              <div className="rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-800">
-                No hay alertas GPS abiertas en este momento.
-              </div>
-            ) : (
-              openAlerts.map((item) => (
-                <div
-                  key={item.id_ticket}
-                  className="rounded-[24px] border border-rose-200 bg-rose-50 p-5"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-600 text-white">
-                      <AlertTriangle className="h-5 w-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-sm font-semibold text-rose-950">
-                        Falla de ubicacion detectada
-                      </h4>
-                      <p className="mt-1 text-sm text-rose-800">
-                        Ticket #{item.id_ticket} · Propiedad {item.id_propiedad}
-                      </p>
-                      <p className="mt-2 text-sm text-slate-600">
-                        Gasto: ${item.monto_pagado} · Estado GPS: {item.alerta_gps}
-                      </p>
-                      <a
-                        href={getApiUrl(`/api/acta/${item.id_ticket}`)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 inline-flex text-sm font-semibold text-slate-900 underline-offset-4 hover:underline"
-                      >
-                        Descargar acta de inspeccion
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </article>
+          ))}
+        </div>
       </section>
+
+      {metrics.recientes.length > 0 && (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="flex items-center gap-2">
+            <Receipt className="h-4 w-4 text-slate-400" />
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Últimos registros</p>
+          </div>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  <th className="pb-2 pr-3">Ticket</th>
+                  <th className="pb-2 pr-3">Propiedad</th>
+                  <th className="pb-2 pr-3">Servicio</th>
+                  <th className="pb-2 pr-3">Monto</th>
+                  <th className="pb-2 pr-3">Fecha</th>
+                  <th className="pb-2 pr-3">Dictamen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {metrics.recientes.map((g) => (
+                  <tr key={g.id_ticket} className="border-b border-slate-100 last:border-0">
+                    <td className="py-2.5 pr-3 font-mono text-xs text-slate-500">#{g.id_ticket}</td>
+                    <td className="py-2.5 pr-3 text-slate-700">{g.nombre_propiedad || g.id_propiedad}</td>
+                    <td className="py-2.5 pr-3 text-slate-600">{g.id_servicio}</td>
+                    <td className="py-2.5 pr-3 font-medium text-slate-900">${g.monto_pagado?.toFixed(2)}</td>
+                    <td className="py-2.5 pr-3 text-xs text-slate-500">{g.fecha_registro}</td>
+                    <td className="py-2.5">
+                      <span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                        g.dictamen_final === "APROBADO"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : g.dictamen_final === "RECHAZADO"
+                          ? "bg-rose-50 text-rose-700"
+                          : "bg-amber-50 text-amber-700"
+                      }`}>
+                        {g.dictamen_final}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </>
   );
 }

@@ -3,8 +3,13 @@ import {
   Boxes,
   ChartColumnBig,
   ClipboardCheck,
+  Globe,
   LayoutDashboard,
   Package,
+  Users,
+  FileEdit,
+  Building2,
+  DollarSign,
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -31,11 +36,32 @@ export const navigationItems: NavigationItem[] = [
     icon: Package,
   },
   {
+    href: "/requerimientos",
+    label: "Requerimientos",
+    shortLabel: "Req.",
+    description: "Solicitudes, asignacion y cierre con auditoria",
+    icon: FileEdit,
+  },
+  {
     href: "/activos",
     label: "Activos Fijos",
     shortLabel: "Activos",
     description: "Inventario fisico, validacion GPS y mapa",
     icon: Boxes,
+  },
+  {
+    href: "/propiedades",
+    label: "Propiedades",
+    shortLabel: "Props.",
+    description: "Capillas, centros y ubicaciones",
+    icon: Building2,
+  },
+  {
+    href: "/catalogo",
+    label: "Catálogo",
+    shortLabel: "Cat.",
+    description: "Precios de referencia para auditoría",
+    icon: DollarSign,
   },
   {
     href: "/auditoria",
@@ -50,6 +76,20 @@ export const navigationItems: NavigationItem[] = [
     shortLabel: "Reportes",
     description: "Resumen ejecutivo y focos de seguimiento",
     icon: ChartColumnBig,
+  },
+  {
+    href: "/usuarios",
+    label: "Usuarios",
+    shortLabel: "Usuarios",
+    description: "Gestion de usuarios, roles y asignaciones",
+    icon: Users,
+  },
+  {
+    href: "/publico",
+    label: "Publico",
+    shortLabel: "Publico",
+    description: "Transparencia, rendicion de cuentas y consulta ciudadana",
+    icon: Globe,
   },
 ];
 
