@@ -11,7 +11,7 @@ Python esta presente pero no hay ninguna version de Python instalada.
    Durante la instalacion, marcar "Add python.exe to PATH".
 
 2. Abrir una nueva terminal de PowerShell y ubicarse en el backend:
-   cd C:\Users\Santiago\Documents\INV\app-inv\backend
+   cd C:\Users\jesia\OneDrive\Desktop\appINV\backend
 
 3. Verificar la instalacion:
    py --version
@@ -25,7 +25,13 @@ Python esta presente pero no hay ninguna version de Python instalada.
 6. Instalar dependencias:
    python -m pip install -r requirements.txt
 
-7. Levantar el backend:
+7. Configurar variables de entorno (opcional, editar .env):
+   - SECRET_KEY: clave para firmar JWT (default: siar-secret-key-change-in-production)
+   - ALLOWED_ORIGINS: origenes CORS separados por coma (default: *)
+   - DATABASE_URL: ruta a la base SQLite (default: control_recursos.db)
+   - ACCESS_TOKEN_EXPIRE_MINUTES: minutos de validez del token (default: 480)
+
+8. Levantar el backend:
    python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 Opcional:

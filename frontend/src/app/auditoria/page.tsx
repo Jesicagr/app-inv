@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Camera,
   CheckCircle,
@@ -8,17 +9,36 @@ import {
   ShieldCheck,
   RefreshCw,
   MapPin,
+  X,
 } from "lucide-react";
 import PageHeader from "../../components/ui/PageHeader";
 import { getApiUrl } from "../../lib/api";
+import { useAuth } from "../../lib/AuthContext";
 
 type AuditResult = {
   alerta_gps?: string;
   alerta_financiera?: string;
+  dictamen_final?: string;
   id_ticket?: string;
+  lat_oficial?: number;
+  lon_oficial?: number;
+  lat_foto?: number;
+  lon_foto?: number;
+};
+
+const MapaAuditoria = dynamic(() => import('../../components/MapaInspeccion'), {
+  ssr: false,
+  loading: () => <div className="w-full h-[250px] bg-slate-100 animate-pulse rounded-xl flex items-center justify-center text-xs text-slate-400">Cargando visor cartográfico...</div>
+});
+
+type Propiedad = {
+  id_propiedad: string;
+  nombre: string;
 };
 
 export default function AuditoriaPage() {
+  const { usuario } = useAuth();
+  const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
   const [formData, setFormData] = useState({
     id_propiedad: "",
     id_servicio: "",
@@ -28,6 +48,25 @@ export default function AuditoriaPage() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AuditResult | null>(null);
+
+  const previewUrl = useMemo(() => file ? URL.createObjectURL(file) : null, [file]);
+
+  const esPropiedades = usuario?.rol === "PROPIEDADES";
+
+  useEffect(() => {
+    const propUrl = esPropiedades && usuario
+      ? `/api/propiedades?id_usuario=${usuario.id}`
+      : "/api/propiedades";
+    fetch(getApiUrl(propUrl))
+      .then((r) => r.json())
+      .then((data) => {
+        setPropiedades(data);
+        if (data.length > 0 && !formData.id_propiedad) {
+          setFormData((prev) => ({ ...prev, id_propiedad: data[0].id_propiedad }));
+        }
+      })
+      .catch(() => {});
+  }, [usuario]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -68,8 +107,7 @@ export default function AuditoriaPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Inspeccion tecnica"
-        title="Auditoria"
+        title="Auditoría"
         description="Este modulo ya queda alineado con el resto del frontend: a la izquierda el registro de campo y a la derecha el dictamen que devuelve el backend."
       />
 
@@ -85,17 +123,23 @@ export default function AuditoriaPage() {
           <form onSubmit={handleUpload} className="mt-6 space-y-4">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Id ubicacion oficial
+                Propiedad
               </label>
-              <input
-                type="text"
+              <select
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-colors focus:border-slate-900 focus:bg-white"
-                placeholder="Ej. CAP-01"
+                value={formData.id_propiedad}
                 onChange={(e) =>
                   setFormData({ ...formData, id_propiedad: e.target.value })
                 }
                 required
-              />
+              >
+                <option value="">Seleccionar propiedad</option>
+                {propiedades.map((p) => (
+                  <option key={p.id_propiedad} value={p.id_propiedad}>
+                    {p.nombre || p.id_propiedad}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -160,9 +204,25 @@ export default function AuditoriaPage() {
                 className="absolute inset-0 opacity-0"
                 onChange={handleFileChange}
               />
-              <Camera className="mx-auto h-9 w-9 text-slate-400" />
+              {previewUrl ? (
+                <img src={previewUrl} alt="Preview" className="mx-auto max-h-48 rounded-xl object-contain" />
+              ) : (
+                <Camera className="mx-auto h-9 w-9 text-slate-400" />
+              )}
               <span className="mt-2 block text-sm font-medium text-slate-600">
-                {file ? file.name : "Tomar foto en campo"}
+                {file ? file.name : "Tomar foto desde la camara"}
+              </span>
+              {file && (
+                <button
+                  type="button"
+                  onClick={() => setFile(null)}
+                  className="mt-2 inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200"
+                >
+                  <X className="h-3 w-3" /> Quitar foto
+                </button>
+              )}
+              <span className="mt-1 block text-xs text-slate-400">
+                La foto se captura directamente preservando los metadatos GPS del dispositivo
               </span>
             </label>
 
@@ -213,6 +273,14 @@ export default function AuditoriaPage() {
 
             {result ? (
               <div className="space-y-4">
+                <MapaAuditoria
+                  latOficial={result.lat_oficial}
+                  lonOficial={result.lon_oficial}
+                  latCaptura={result.lat_foto}
+                  lonCaptura={result.lon_foto}
+                  nombreCapilla={formData.id_propiedad || "Capilla Evaluada"}
+                />
+
                 <div
                   className={`rounded-[24px] border p-4 ${
                     result.alerta_gps === "VALIDADO"
@@ -256,6 +324,26 @@ export default function AuditoriaPage() {
                     </div>
                   </div>
                 </div>
+
+                {result.dictamen_final ? (
+                  <div className={`rounded-[24px] border p-4 ${
+                    result.dictamen_final === "APROBADO"
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-950"
+                      : "border-rose-200 bg-rose-50 text-rose-950"
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      {result.dictamen_final === "APROBADO" ? (
+                        <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                      ) : (
+                        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+                      )}
+                      <div>
+                        <h4 className="text-sm font-semibold">Dictamen final</h4>
+                        <p className="mt-1 text-sm">{result.dictamen_final}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
 
                 {result.id_ticket ? (
                   <a

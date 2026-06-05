@@ -15,7 +15,7 @@ de scripts, puedes usar `npm.cmd` o habilitar scripts para tu usuario.
    completa desde PowerShell.
 
 3. Abrir una nueva terminal de PowerShell y ubicarse en el frontend:
-   cd C:\Users\Santiago\Documents\INV\app-inv\frontend
+    cd C:\Users\jesia\OneDrive\Desktop\appINV\frontend
 
 4. Si PowerShell bloquea `npm.ps1`, ejecutar una de estas opciones:
    npm.cmd -v

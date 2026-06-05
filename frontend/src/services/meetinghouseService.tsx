@@ -308,7 +308,7 @@ function extractDetailFromJsonValue(value: unknown): MeetinghouseDetail {
   ]);
 
   if (name || address) {
-    return { name: normalizeText(name), address: normalizeText(address) };
+    return { name: normalizeText(name) ?? undefined, address: normalizeText(address) ?? undefined };
   }
 
   const nestedKeys = Object.keys(value);
