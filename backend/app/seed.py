@@ -23,12 +23,12 @@ def seed():
     cursor.execute("SELECT id_rol FROM roles WHERE nombre_rol='LIDER'")
     lider_rol = cursor.fetchone()[0]
 
-    # ── Usuarios ──
+    # ── Usuarios (credenciales desde variables de entorno) ──
     usuarios = [
-        ("admin@siar.com", "Administrador", "admin123", admin_rol),
-        ("prop@siar.com", "Carlos Propiedades", "prop123", prop_rol),
-        ("lider1@siar.com", "Juan Líder", "lider123", lider_rol),
-        ("lider2@siar.com", "María Líder", "lider123", lider_rol),
+        (os.getenv("SEED_ADMIN_EMAIL", "admin@siar.com"), "Administrador", os.getenv("SEED_ADMIN_PASSWORD", "admin123"), admin_rol),
+        (os.getenv("SEED_PROP_EMAIL", "prop@siar.com"), "Carlos Propiedades", os.getenv("SEED_PROP_PASSWORD", "prop123"), prop_rol),
+        (os.getenv("SEED_LIDER1_EMAIL", "lider1@siar.com"), "Juan Líder", os.getenv("SEED_LIDER1_PASSWORD", "lider123"), lider_rol),
+        (os.getenv("SEED_LIDER2_EMAIL", "lider2@siar.com"), "María Líder", os.getenv("SEED_LIDER2_PASSWORD", "lider123"), lider_rol),
     ]
     for email, nombre, pw, rol in usuarios:
         cursor.execute("SELECT id_usuario FROM usuarios WHERE email=?", (email,))

@@ -108,12 +108,14 @@ def startup():
     cursor.execute("SELECT id_rol FROM roles WHERE nombre_rol='ADMIN'")
     admin_rol = cursor.fetchone()
     if admin_rol:
-        cursor.execute("SELECT id_usuario FROM usuarios WHERE email='admin@siar.com'")
+        admin_email = os.getenv("SEED_ADMIN_EMAIL", "admin@siar.com")
+        admin_password = os.getenv("SEED_ADMIN_PASSWORD", "admin123")
+        cursor.execute("SELECT id_usuario FROM usuarios WHERE email=?", (admin_email,))
         if not cursor.fetchone():
-            hashed = hash_password("admin123")
+            hashed = hash_password(admin_password)
             cursor.execute(
                 "INSERT INTO usuarios (nombre, email, password_hash, id_rol) VALUES (?, ?, ?, ?)",
-                ("Administrador", "admin@siar.com", hashed, admin_rol["id_rol"]),
+                ("Administrador", admin_email, hashed, admin_rol["id_rol"]),
             )
     
     conn.commit()
