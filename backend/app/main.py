@@ -2,6 +2,7 @@ import os
 import logging
 import math
 import sqlite3
+from typing import Optional
 from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import Response
@@ -433,8 +434,8 @@ async def eliminar_catalogo(id_servicio: str, db=Depends(get_db)):
 
 @app.get("/api/activos")
 async def listar_activos(
-    id_propiedad: str = None,
-    id_usuario: int = None,
+    id_propiedad: Optional[str] = None,
+    id_usuario: Optional[int] = None,
     page: int = Query(default=1, ge=1),
     per_page: int = Query(default=50, ge=1, le=200),
     db=Depends(get_db)
@@ -535,7 +536,7 @@ async def eliminar_activo(id_activo: int, db=Depends(get_db)):
     return {"status": "success"}
 
 @app.get("/api/propiedades")
-async def listar_propiedades(id_usuario: int = None, db=Depends(get_db)):
+async def listar_propiedades(id_usuario: Optional[int] = None, db=Depends(get_db)):
     cursor = db.cursor()
     if id_usuario:
         cursor.execute("""
@@ -707,7 +708,7 @@ async def eliminar_usuario(id_usuario: int, db=Depends(get_db)):
     return {"status": "success"}
 
 @app.get("/api/asignaciones")
-async def listar_asignaciones(id_usuario: int = None, db=Depends(get_db)):
+async def listar_asignaciones(id_usuario: Optional[int] = None, db=Depends(get_db)):
     cursor = db.cursor()
     if id_usuario:
         cursor.execute("""
@@ -743,9 +744,9 @@ async def crear_asignacion(
 
 @app.get("/api/requerimientos")
 async def listar_requerimientos(
-    estado: str = None,
-    id_usuario: int = None,
-    id_propiedad: str = None,
+    estado: Optional[str] = None,
+    id_usuario: Optional[int] = None,
+    id_propiedad: Optional[str] = None,
     page: int = Query(default=1, ge=1),
     per_page: int = Query(default=50, ge=1, le=200),
     db=Depends(get_db)
@@ -1023,8 +1024,8 @@ async def publico_propiedades(db=Depends(get_db)):
 
 @app.get("/api/publico/gastos")
 async def publico_gastos(
-    id_propiedad: str = None,
-    year: int = None,
+    id_propiedad: Optional[str] = None,
+    id_usuario: Optional[int] = None,
     page: int = Query(default=1, ge=1),
     per_page: int = Query(default=50, ge=1, le=200),
     db=Depends(get_db)

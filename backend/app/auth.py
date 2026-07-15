@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -31,7 +32,7 @@ def create_access_token(data: dict) -> str:
 def get_user_from_token(token: str, db):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id_str: str = payload.get("sub")
+        user_id_str: Optional[str] = payload.get("sub")
         if user_id_str is None:
             return None
         user_id = int(user_id_str)
