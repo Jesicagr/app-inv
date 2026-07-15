@@ -11,7 +11,6 @@ import {
   Building2,
   DollarSign,
   Users,
-  Globe,
 } from "lucide-react";
 import PageHeader from "../../../components/ui/PageHeader";
 import StatCard from "../../../components/ui/StatCard";
@@ -44,7 +43,6 @@ const modules = [
   { href: "/propiedades", label: "Propiedades", description: "Capillas, centros y ubicaciones oficiales.", icon: Building2 },
   { href: "/catalogo", label: "Catálogo", description: "Precios de referencia para control financiero.", icon: DollarSign },
   { href: "/usuarios", label: "Usuarios", description: "Gestión de usuarios, roles y asignaciones.", icon: Users },
-  { href: "/publico", label: "Transparencia", description: "Rendición de cuentas y consulta ciudadana.", icon: Globe },
 ];
 
 export default async function Dashboard() {
@@ -112,14 +110,21 @@ export default async function Dashboard() {
         />
       </section>
 
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-          Acceso rápido
-        </p>
-        <h3 className="mt-2 text-xl font-semibold text-slate-900">
-          Módulos del sistema
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
+      <section className="rounded-[28px] border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 text-white shadow-lg shadow-slate-900/20">
+            <Package className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+              Acceso rápido
+            </p>
+            <h3 className="text-xl font-semibold text-slate-900">
+              Módulos del sistema
+            </h3>
+          </div>
+        </div>
+        <p className="mt-3 text-sm text-slate-500">
           Navegación directa a cada área operativa del SIAR.
         </p>
 
@@ -128,13 +133,16 @@ export default async function Dashboard() {
             <Link
               key={href}
               href={href}
-              className="group rounded-[20px] border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+              className="group relative overflow-hidden rounded-[20px] border border-slate-200/60 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-slate-300/80 hover:shadow-lg hover:shadow-slate-200/50"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white transition-colors group-hover:bg-slate-800">
-                <Icon className="h-5 w-5" />
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br from-slate-100 to-slate-50 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+              <div className="relative">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 text-white shadow-md shadow-slate-900/10 transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-slate-900/20">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h4 className="mt-4 font-semibold text-slate-900 transition-colors group-hover:text-slate-950">{label}</h4>
+                <p className="mt-1 text-sm leading-5 text-slate-500">{description}</p>
               </div>
-              <h4 className="mt-4 font-semibold text-slate-900">{label}</h4>
-              <p className="mt-1 text-sm leading-5 text-slate-500">{description}</p>
             </Link>
           ))}
         </div>

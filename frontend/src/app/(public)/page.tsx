@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, MapPin, ClipboardCheck, Package, Boxes, FileEdit, Building2 } from "lucide-react";
+import { ArrowRight, ShieldCheck, MapPin, ClipboardCheck, Package, Boxes, FileEdit } from "lucide-react";
 
 const features = [
   { icon: MapPin, title: "Georreferenciación", description: "Validación GPS de cada inspección con comparación contra coordenadas oficiales." },
@@ -7,7 +7,6 @@ const features = [
   { icon: Package, title: "Control de Stock", description: "Gestión de consumibles con semáforo de stock mínimo y ajustes de inventario." },
   { icon: Boxes, title: "Activos Fijos", description: "Inventario físico con códigos, estados y mapa interactivo por propiedad." },
   { icon: FileEdit, title: "Requerimientos", description: "Flujo de solicitudes, asignación y cierre con dictamen automático." },
-  { icon: Building2, title: "Transparencia", description: "Dashboard público de integridad con gastos, actas y mapa de activos." },
 ];
 
 export default function LandingPage() {

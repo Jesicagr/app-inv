@@ -95,7 +95,7 @@ export default function PublicoPage() {
         <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-[20px] bg-slate-900">
           <ShieldCheck className="h-7 w-7 text-white" />
         </div>
-        <h1 className="text-3xl font-semibold text-slate-900">Transparencia SIAR</h1>
+        <h1 className="text-3xl font-semibold text-slate-900">SIAR</h1>
         <p className="mt-2 text-slate-500 max-w-xl mx-auto">
           Dashboard de integridad, mapa de activos y buscador de gastos para rendicion de cuentas.
         </p>
@@ -195,7 +195,7 @@ export default function PublicoPage() {
       {/* Buscador de Gastos */}
       <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Buscador Transparente</p>
-        <h2 className="mt-2 text-xl font-semibold text-slate-900">Gastos y actas de inspeccion</h2>
+        <h2 className="mt-2 text-xl font-semibold text-slate-900">Gastos y actas de inspección</h2>
 
         <div className="mt-4 flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-[200px]">
@@ -214,7 +214,7 @@ export default function PublicoPage() {
             onChange={(e) => setSelYear(e.target.value)}
             className="rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-slate-900"
           >
-            <option value="">Todos los anos</option>
+            <option value="">Todos los años</option>
             {years.map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
