@@ -114,9 +114,6 @@ export default function AppHeader() {
     <header className="shrink-0 border-b border-slate-200 bg-white/90 px-5 py-4 backdrop-blur md:px-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-            Modulo activo
-          </p>
           <div className="mt-1 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white">
               <CurrentIcon className="h-5 w-5" />
@@ -171,11 +168,7 @@ export default function AppHeader() {
           </div>
 
           <div className="flex items-center justify-between gap-2">
-            <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-500 xl:flex">
-              <span>{navigationItems.length} modulos</span>
-              <span className="h-1 w-1 rounded-full bg-slate-300" />
-              <span>Operacion local</span>
-            </div>
+
 
             <div className="relative">
               <button

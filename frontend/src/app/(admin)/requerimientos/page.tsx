@@ -13,10 +13,10 @@ import {
   UserCheck,
   Circle,
 } from "lucide-react";
-import PageHeader from "../../components/ui/PageHeader";
-import StatCard from "../../components/ui/StatCard";
-import { api } from "../../lib/api-client";
-import { useAuth } from "../../lib/AuthContext";
+import PageHeader from "../../../components/ui/PageHeader";
+import StatCard from "../../../components/ui/StatCard";
+import { api } from "../../../lib/api-client";
+import { useAuth } from "../../../lib/AuthContext";
 
 type Requerimiento = {
   id_requerimiento: number;

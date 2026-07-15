@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, X, Tag } from "lucide-react";
-import PageHeader from "../../components/ui/PageHeader";
-import { getApiUrl } from "../../lib/api";
+import PageHeader from "../../../components/ui/PageHeader";
+import { getApiUrl } from "../../../lib/api";
 
 type CatalogoItem = {
   id_servicio: string;

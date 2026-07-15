@@ -3,7 +3,6 @@ import {
   Boxes,
   ChartColumnBig,
   ClipboardCheck,
-  Globe,
   LayoutDashboard,
   Package,
   Users,
@@ -22,7 +21,7 @@ export type NavigationItem = {
 
 export const navigationItems: NavigationItem[] = [
   {
-    href: "/",
+    href: "/dashboard",
     label: "Dashboard",
     shortLabel: "Panel",
     description: "Metricas generales y alertas de supervision",
@@ -34,13 +33,6 @@ export const navigationItems: NavigationItem[] = [
     shortLabel: "Consumibles",
     description: "Stock, gasto validado y movimientos",
     icon: Package,
-  },
-  {
-    href: "/requerimientos",
-    label: "Requerimientos",
-    shortLabel: "Req.",
-    description: "Solicitudes, asignacion y cierre con auditoria",
-    icon: FileEdit,
   },
   {
     href: "/activos",
@@ -55,6 +47,13 @@ export const navigationItems: NavigationItem[] = [
     shortLabel: "Props.",
     description: "Capillas, centros y ubicaciones",
     icon: Building2,
+  },
+  {
+    href: "/requerimientos",
+    label: "Requerimientos",
+    shortLabel: "Req.",
+    description: "Solicitudes, asignacion y cierre con auditoria",
+    icon: FileEdit,
   },
   {
     href: "/catalogo",
@@ -83,13 +82,6 @@ export const navigationItems: NavigationItem[] = [
     shortLabel: "Usuarios",
     description: "Gestion de usuarios, roles y asignaciones",
     icon: Users,
-  },
-  {
-    href: "/publico",
-    label: "Publico",
-    shortLabel: "Publico",
-    description: "Transparencia, rendicion de cuentas y consulta ciudadana",
-    icon: Globe,
   },
 ];
 

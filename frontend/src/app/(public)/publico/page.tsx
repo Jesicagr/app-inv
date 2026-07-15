@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle, Download, MapPin, Package, Search, ShieldCheck } from "lucide-react";
 import dynamic from "next/dynamic";
-import { getApiUrl } from "../../lib/api";
+import { getApiUrl } from "../../../lib/api";
 
-const MapaPublico = dynamic(() => import("../../components/MapaPublico"), {
+const MapaPublico = dynamic(() => import("../../../components/MapaPublico"), {
   ssr: false,
   loading: () => (
     <div className="flex h-[400px] items-center justify-center rounded-[28px] border border-slate-200 bg-slate-100 text-sm font-medium text-slate-400">

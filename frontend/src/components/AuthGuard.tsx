@@ -9,7 +9,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const rutasPublicas = ["/login", "/publico"];
+  const rutasPublicas = ["/", "/login", "/publico"];
 
   useEffect(() => {
     if (loading) return;
@@ -18,7 +18,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       router.replace("/login");
     }
     if (token && pathname === "/login") {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [token, loading, pathname, router]);
 

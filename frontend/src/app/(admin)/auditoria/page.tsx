@@ -11,9 +11,9 @@ import {
   MapPin,
   X,
 } from "lucide-react";
-import PageHeader from "../../components/ui/PageHeader";
-import { getApiUrl } from "../../lib/api";
-import { useAuth } from "../../lib/AuthContext";
+import PageHeader from "../../../components/ui/PageHeader";
+import { getApiUrl } from "../../../lib/api";
+import { useAuth } from "../../../lib/AuthContext";
 
 type AuditResult = {
   alerta_gps?: string;
@@ -26,7 +26,7 @@ type AuditResult = {
   lon_foto?: number;
 };
 
-const MapaAuditoria = dynamic(() => import('../../components/MapaInspeccion'), {
+const MapaAuditoria = dynamic(() => import('../../../components/MapaInspeccion'), {
   ssr: false,
   loading: () => <div className="w-full h-[250px] bg-slate-100 animate-pulse rounded-xl flex items-center justify-center text-xs text-slate-400">Cargando visor cartográfico...</div>
 });
