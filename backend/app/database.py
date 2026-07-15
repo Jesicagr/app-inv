@@ -47,6 +47,7 @@ def inicializar_tablas():
         descripcion TEXT,
         estado TEXT DEFAULT 'BUENO',
         codigo_inventario TEXT,
+        codigo_activo TEXT UNIQUE,
         url_foto TEXT,
         FOREIGN KEY(id_propiedad) REFERENCES propiedades(id_propiedad)
     )''')
@@ -58,6 +59,7 @@ def inicializar_tablas():
         stock_actual INTEGER DEFAULT 0,
         stock_minimo INTEGER DEFAULT 0,
         unidad_medida TEXT DEFAULT 'unidades',
+        codigo_consumible TEXT UNIQUE,
         FOREIGN KEY(id_propiedad) REFERENCES propiedades(id_propiedad)
     )''')
     
@@ -121,6 +123,8 @@ def inicializar_tablas():
         ("ALTER TABLE gastos ADD COLUMN lon_foto REAL", "gastos.lon_foto"),
         ("ALTER TABLE gastos ADD COLUMN dictamen_final TEXT", "gastos.dictamen_final"),
         ("ALTER TABLE gastos ADD COLUMN fecha_registro TEXT", "gastos.fecha_registro"),
+        ("ALTER TABLE activos_fijos ADD COLUMN codigo_activo TEXT", "activos_fijos.codigo_activo"),
+        ("ALTER TABLE consumibles ADD COLUMN codigo_consumible TEXT", "consumibles.codigo_consumible"),
     ]
     for sql, _ in migraciones:
         try:

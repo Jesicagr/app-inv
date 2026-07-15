@@ -100,6 +100,9 @@ def seed():
             "INSERT INTO activos_fijos (id_propiedad, nombre, descripcion, estado, codigo_inventario) VALUES (?, ?, ?, ?, ?)",
             row,
         )
+    cursor.execute("SELECT id_activo FROM activos_fijos WHERE codigo_activo IS NULL")
+    for (id_activo,) in cursor.fetchall():
+        cursor.execute("UPDATE activos_fijos SET codigo_activo=? WHERE id_activo=?", (f"ACT-{id_activo:04d}", id_activo))
 
     # ── Consumibles ──
     consumibles = [
@@ -121,6 +124,9 @@ def seed():
             "INSERT INTO consumibles (id_propiedad, nombre, stock_actual, stock_minimo, unidad_medida) VALUES (?, ?, ?, ?, ?)",
             row,
         )
+    cursor.execute("SELECT id_consumible FROM consumibles WHERE codigo_consumible IS NULL")
+    for (id_consumible,) in cursor.fetchall():
+        cursor.execute("UPDATE consumibles SET codigo_consumible=? WHERE id_consumible=?", (f"CONS-{id_consumible:04d}", id_consumible))
 
     # ── Asignaciones (PROPIEDADES a CAP-001, CAP-002, CAP-003) ──
     cursor.execute("SELECT id_usuario FROM usuarios WHERE email='prop@siar.com'")

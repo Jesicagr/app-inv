@@ -328,8 +328,11 @@ async def crear_consumible(
         "INSERT INTO consumibles (id_propiedad, nombre, stock_actual, stock_minimo, unidad_medida) VALUES (?, ?, ?, ?, ?)",
         (id_propiedad, nombre, stock_actual, stock_minimo, unidad_medida),
     )
+    id_consumible = cursor.lastrowid
+    codigo = f"CONS-{id_consumible:04d}"
+    cursor.execute("UPDATE consumibles SET codigo_consumible=? WHERE id_consumible=?", (codigo, id_consumible))
     db.commit()
-    return {"status": "success", "id_consumible": cursor.lastrowid}
+    return {"status": "success", "id_consumible": id_consumible, "codigo_consumible": codigo}
 
 @app.put("/api/consumibles/{id_consumible}")
 async def actualizar_consumible(
@@ -485,9 +488,11 @@ async def crear_activo(
         "INSERT INTO activos_fijos (id_propiedad, nombre, descripcion, estado, codigo_inventario, url_foto) VALUES (?, ?, ?, ?, ?, ?)",
         (id_propiedad, nombre, descripcion, estado, codigo_inventario, url_foto),
     )
-    db.commit()
     id_activo = cursor.lastrowid
-    return {"status": "success", "id_activo": id_activo}
+    codigo = f"ACT-{id_activo:04d}"
+    cursor.execute("UPDATE activos_fijos SET codigo_activo=? WHERE id_activo=?", (codigo, id_activo))
+    db.commit()
+    return {"status": "success", "id_activo": id_activo, "codigo_activo": codigo}
 
 @app.put("/api/activos/{id_activo}")
 async def actualizar_activo(
